@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Data to Firebase</title>
+    <link rel="stylesheet" href="style4.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* General Styles for Form Elements */
+
+        /* General Styles for Form Elements */
+        .form-search,
+        .note-input {
+            width: calc(100% - 16px);
+            /* Adjust width to match padding */
+            padding: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            margin-bottom: 16px;
+            /* Consistent spacing */
+        }
+
+        /* General Styles for Form Elements */
+        .form-search,
+        .note-input {
+            width: calc(100% - 16px);
+            /* Adjust width to match padding */
+            padding: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            margin-bottom: 16px;
+            /* Consistent spacing */
+        }
+
+        .form-search:focus,
+        .note-input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        /* Read-only Styles for Note Input */
+        .note-input[readonly] {
+            background-color: #f5f5f5;
+            /* Light grey background */
+            border-color: #ddd;
+            /* Lighter border color */
+            color: #999;
+            /* Grey text color */
+            cursor: pointer;
+            /* Show pointer cursor to indicate it's clickable */
+            box-shadow: none;
+            /* Remove box-shadow */
+        }
+
+
+        /* Styles for headings */
+        h3,
+        h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 18px;
+        }
+
+        h4 {
+            font-size: 16px;
+        }
+
+        /* Span inside h3 for data count */
+        #dataCount {
+            font-weight: bold;
+            color: black;
+        }
+
+        /* Form styles */
+        .dataForm {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .dataForm label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .dataForm input[type="text"],
+        .dataForm input[type="number"] {
+            width: calc(100% - 16px);
+            /* Adjust for padding */
+            padding: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .dataForm button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Search Form Styles */
+        #searchForm {
+            margin: 20px auto;
+            max-width: 400px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Search Input */
+        #searchForm input[type="text"] {
+            width: calc(100% - 16px);
+            /* Adjust for padding */
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #searchForm input[type="text"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+
+
+        /* Form Button */
+        #searchForm button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        #searchForm button:hover {
+            background-color: #45a049;
+        }
+
+        /* Data list styles */
+        ul#dataList {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        li {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        li span {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .timer {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .edit-button,
+        .delete-button,
+        .reset-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .delete-button {
+            background-color: #f44336;
+        }
+
+        .reset-button {
+            background-color: #008CBA;
+        }
+
+        .image-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .image-container img {
+            width: 40px;
+            height: auto;
+        }
+
+        .form-checkbox {
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-checkbox-supportToDesktop {
+            position: absolute;
+            top: 218px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            appearance: none;
+            /* Remove default checkbox styling */
+            width: 20px;
+            height: 20px;
+            border: 2px solid grey;
+            /* Border color */
+            background-color: white;
+            /* Background color */
+            cursor: pointer;
+            border-radius: 3px;
+            /* Optional: rounded corners */
+        }
+
+        .form-checkbox-supportToEmulator {
+            position: absolute;
+            top: 255px;
+            right: 45px;
+            display: flex;
+            align-items: center;
+            appearance: none;
+            /* Remove default checkbox styling */
+            width: 20px;
+            height: 20px;
+            border: 2px solid cyan;
+            /* Border color */
+            background-color: white;
+            /* Background color */
+            cursor: pointer;
+            border-radius: 3px;
+            /* Optional: rounded corners */
+        }
+
+        /* Style for the checkbox when it is checked */
+        .form-checkbox-supportToDesktop:checked {
+            background-color: grey;
+            /* Background color when checked */
+            border-color: grey;
+            /* Border color when checked */
+        }
+
+        /* Style for the checkbox when it is checked */
+        .form-checkbox-supportToEmulator:checked {
+            background-color: cyan;
+            /* Background color when checked */
+            border-color: cyan;
+            /* Border color when checked */
+        }
+
+
+        .scroll-button {
+            position: fixed;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .scroll-to-bottom {
+            top: 20px;
+            right: 20px;
+        }
+
+        .scroll-to-top {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        #editModal {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: #f0f0f0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            z-index: 1000;
+            width: 300px;
+            /* Menambahkan lebar modal untuk estetika */
+        }
+
+        #editModal div {
+            margin-bottom: 10px;
+        }
+
+        #editModal input[type="text"] {
+            width: 100%;
+            /* Membuat input mengisi lebar kontainer */
+            padding: 10px;
+            /* Memberikan padding di dalam input */
+            border: 1px solid #ddd;
+            /* Mengubah warna border untuk tampilan lebih bersih */
+            border-radius: 4px;
+            /* Membuat sudut input menjadi melengkung */
+            box-sizing: border-box;
+            /* Menghitung padding dan border dalam lebar total */
+        }
+
+        #editModal button {
+            padding: 10px 15px;
+            /* Memberikan padding pada tombol */
+            font-size: 16px;
+            /* Mengatur ukuran font tombol */
+            border-radius: 4px;
+            /* Membuat sudut tombol menjadi melengkung */
+            border: none;
+            /* Menghapus border tombol default */
+            background-color: #007bff;
+            /* Mengatur warna latar belakang tombol */
+            color: white;
+            /* Mengatur warna teks tombol */
+            cursor: pointer;
+            /* Mengubah cursor saat hover di tombol */
+        }
+
+        #editModal button:hover {
+            background-color: #0056b3;
+            /* Mengubah warna latar belakang tombol saat hover */
+        }
+
+        /* Styles for the floating card modal */
+        #editNoteModal {
+            display: none;
+            /* Initially hidden */
+            position: fixed;
+            /* Fixed position to make it float */
+            top: 50%;
+            /* Center vertically */
+            left: 50%;
+            /* Center horizontally */
+            transform: translate(-50%, -50%);
+            /* Adjust for perfect centering */
+            width: 90%;
+            /* Width relative to the viewport */
+            max-width: 600px;
+            /* Increased maximum width */
+            background-color: #fff;
+            /* White background */
+            border-radius: 8px;
+            /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* Slight shadow for floating effect */
+            padding: 20px;
+            /* Inner padding */
+            z-index: 1000;
+            /* Ensure it appears above other elements */
+            box-sizing: border-box;
+            /* Ensure padding is included in width calculations */
+            overflow-y: auto;
+            /* Enable vertical scroll if content is too long */
+            max-height: 80vh;
+            /* Limit the maximum height to 80% of the viewport height */
+        }
+
+        /* Style for each form group */
+        #editNoteModal div {
+            margin-bottom: 20px;
+            /* Space between input and buttons */
+        }
+
+        /* Style for text input */
+        #editNoteModal input[type="text"] {
+            width: 100%;
+            /* Full width */
+            padding: 14px;
+            /* Increase padding */
+            border: 1px solid #ccc;
+            /* Consistent border */
+            border-radius: 4px;
+            /* Rounded corners */
+            font-size: 18px;
+            /* Increase font size */
+            box-sizing: border-box;
+            /* Ensure padding is included in width calculations */
+            transition: border-color 0.3s, box-shadow 0.3s;
+            /* Smooth transitions */
+        }
+
+        #editNoteModal input[type="text"]:focus {
+            border-color: #4CAF50;
+            /* Border color on focus */
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            /* Box shadow on focus */
+            outline: none;
+            /* Remove outline */
+        }
+
+        /* Style for textarea */
+        #editNoteModal textarea {
+            width: 100%;
+            /* Full width */
+            padding: 14px;
+            /* Increase padding */
+            border: 1px solid #ccc;
+            /* Consistent border */
+            border-radius: 4px;
+            /* Rounded corners */
+            font-size: 18px;
+            /* Increase font size */
+            box-sizing: border-box;
+            /* Ensure padding is included in width calculations */
+            resize: none;
+            /* Disable resizing */
+            height: 150px;
+            /* Fixed height */
+            transition: border-color 0.3s, box-shadow 0.3s;
+            /* Smooth transitions */
+        }
+
+        #editNoteModal textarea:focus {
+            border-color: #4CAF50;
+            /* Border color on focus */
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            /* Box shadow on focus */
+            outline: none;
+            /* Remove outline */
+        }
+
+        /* Style for buttons */
+        #editNoteModal button {
+            background-color: #007bff;
+            /* Blue background */
+            color: #fff;
+            /* White text */
+            border: none;
+            /* Remove default border */
+            border-radius: 4px;
+            /* Rounded corners */
+            padding: 10px 20px;
+            /* Padding inside the button */
+            font-size: 16px;
+            /* Font size */
+            cursor: pointer;
+            /* Pointer cursor on hover */
+            margin-right: 10px;
+            /* Space between buttons */
+            transition: background-color 0.3s;
+            /* Smooth transition for background color */
+        }
+
+        #editNoteModal button:hover {
+            background-color: #0056b3;
+            /* Darker blue on hover */
+        }
+
+        /* Style for cancel button */
+        #editNoteModal button:last-child {
+            background-color: #f44336;
+            /* Red background */
+        }
+
+        #editNoteModal button:last-child:hover {
+            background-color: #d32f2f;
+            /* Darker red on hover */
+        }
+
+
+        .link-item {
+            margin-bottom: 10px;
+        }
+
+        .link-url,
+        .link-description {
+            width: 300px;
+            margin-right: 10px;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+        }
+
+        /* Optional: Background overlay for the modal */
+        #modalOverlay {
+            display: none;
+            /* Initially hidden */
+            position: fixed;
+            /* Fixed position to cover entire screen */
+            top: 0;
+            /* Start at the top */
+            left: 0;
+            /* Start at the left */
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent black */
+            z-index: 999;
+            /* Below the modal */
+        }
+
+        /* Styles for the reload button */
+        #reloadButton {
+            background-color: #007bff;
+            /* Blue background */
+            color: #fff;
+            /* White text */
+            border: none;
+            /* Remove default border */
+            border-radius: 6px;
+            /* Rounded corners */
+            padding: 10px 20px;
+            /* Padding inside the button */
+            font-size: 16px;
+            /* Font size */
+            cursor: pointer;
+            /* Pointer cursor on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* Shadow for depth */
+
+        }
+
+        #reloadButton:hover {
+            background-color: #0056b3;
+            /* Darker blue on hover */
+            transform: scale(1.1);
+            /* Slightly larger on hover */
+        }
+
+        /* General styles for the line break */
+        .line-break {
+            width: 100%;
+            /* Full width */
+            border-top: 1px solid #ccc;
+            /* Light gray border */
+            margin: 10px 0;
+            /* Top and bottom margin */
+            box-sizing: border-box;
+            /* Ensure padding and border are included in width and height */
+        }
+
+        /* Responsive styles */
+        @media (min-width: 768px) {
+
+            /* For tablets and larger screens (web) */
+            .line-break {
+                border-top: 1px solid #ccc;
+                /* Border on top for web */
+                margin: 10px 0;
+                /* Vertical margin */
+            }
+        }
+
+        @media (max-width: 767px) {
+
+            /* For mobile screens (Android) */
+            .line-break {
+                border-left: 1px solid #ccc;
+                /* Border on the left for mobile */
+                height: 100%;
+                /* Full height of the parent element */
+                margin: 0;
+                /* No margin */
+                display: inline-block;
+                /* Ensure it appears next to the content */
+            }
+        }
+
+        .rating {
+            display: inline-block;
+            font-size: 2em;
+            cursor: pointer;
+            direction: ltr;
+            /* Menyusun bintang dari kiri ke kanan */
+            position: relative;
+            margin-top: -15px;
+            margin-bottom: -18px;
+        }
+
+        .star {
+            color: white;
+            transition: color 0.3s;
+            display: inline-block;
+            position: relative;
+            text-shadow: 0 0 1px black;
+            /* Garis hitam pada bintang */
+        }
+
+        /* Menampilkan warna kuning pada bintang yang di-hover dan yang ada di sebelah kiri */
+        .rating .star.hover,
+        .rating .star.hover~.star {
+            color: gold;
+            /* Warna bintang saat hover */
+            text-shadow: 0 0 1px black;
+            /* Garis hitam tetap muncul saat hover */
+        }
+
+        /* Warna saat bintang dipilih */
+        .star.selected {
+            color: gold;
+            text-shadow: 0 0 1px black;
+            /* Garis hitam tetap muncul saat bintang dipilih */
+        }
+
+        .select-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            /* Optional: adds space between selects */
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 150px;
+            /* Ensures a minimum width for each filter item */
+        }
+
+        .filter-item label {
+            margin-bottom: 5px;
+            /* Space between label and select */
+        }
+
+        .select-container select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            flex: 1;
+            min-width: 150px;
+            /* Optional: sets a minimum width */
+        }
+
+        @media (max-width: 600px) {
+            .select-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .select-container select {
+                max-width: 100%;
+                /* Ensures selects take up full width */
+            }
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #overlayCard {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="editNoteModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Note</h2>
+            <div class="form-group">
+                <p id="noteName">Nama: </p>
+                <label for="editNote">Edit Note:</label>
+                <input type="text" id="editNote" class="form-control">
+            </div>
+            <div>
+                <label for="editBigNote">Edit Big Note:</label>
+                <textarea id="editBigNote" rows="4"></textarea>
+            </div>
+            <div>
+                <label for="linkLabel">Link Label:</label>
+                <input type="text" id="linkLabel" placeholder="Masukkan keterangan tombol">
+                <label for="linkUrl">Link URL:</label>
+                <input type="text" id="linkUrl" placeholder="Masukkan URL">
+                <button id="addLinkButton">Add Link</button>
+            </div>
+            <div>
+                <label>Links:</label>
+                <div id="linksContainer"></div>
+            </div>
+            <div class="form-actions">
+                <button onclick="submitEditNote()">Submit</button>
+                <button onclick="closeNoteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="editModal" style="display:none;">
+        <div>
+            <label for="editNomor">Nomor:</label>
+            <input type="text" id="editNomor">
+        </div>
+        <div>
+            <label for="editNama">Nama:</label>
+            <input type="text" id="editNama">
+        </div>
+        <div>
+            <label for="editLink">Link:</label>
+            <input type="text" id="editLink">
+        </div>
+        <button onclick="submitEditData()">Submit</button>
+        <button onclick="closeModal()">Cancel</button>
+    </div>
+
+
+    <input type="text" id="searchInput" class="form-search" placeholder="Cari nama...">
+
+    <div>
+        <div id="countdown">Reset Attempts: 24 jam 0 menit 0 detik</div>
+        <button id="startButton" style="padding: 20px; border-radius: 10px; border: 1px solid #ccc; width: 90%; height: 90%; 
+           font-size: 32px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+           box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); background-color: white; z-index: 9999;">
+            Mulai
+        </button>
+    </div>
+
+
+    <div id="editNoteModal" style="display:none;">
+        <div>
+            <label for="editNote">Edit Note:</label>
+            <input type="text" id="editNote">
+        </div>
+        <button onclick="submitEditNote()">Submit</button>
+        <button onclick="closeNoteModal()">Cancel</button>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+        <h3>Total Data: <span id="dataCount">0</span></h3>
+        <button id="reloadButton">Reload</button>
+    </div>
+    <div style="display: flex;">
+        <div id="countData" style="margin-right: 10px;"></div>
+        <div id="countTimerOut" style="margin-right: 10px;"></div>
+        <div id="TimerRunning" style="margin-right: 10px;"></div>
+    </div>
+
+    <div id="overlay" style="display: none;">
+        <div id="overlayCard">
+            <p>Countdown telah selesai!</p>
+            <button id="closeOverlayButton" onclick="closeOverlay()">Mulai lagi</button>
+        </div>
+    </div>
+
+
+    <button id="hide-group" style="padding: 10px; border-radius: 5px; border: 1px solid #ccc;">Hide</button>
+
+    <div id="filterGroup">
+        <div class="select-container">
+            <div class="filter-item">
+                <label for="filterSelect">Filter Attempts:</label>
+                <select id="filterSelect">
+                    <option value="all">Semua</option>
+                    <option value="zero">Attempts Nol</option>
+                    <option value="Attempts 1">Attempts 1</option>
+                    <option value="Attempts 2">Attempts 2</option>
+                    <option value="Attempts 3++">Attempts 3++</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
+                <label for="groupSelect">Filter Group:</label>
+                <select id="groupSelect" class="group-dropdown">
+                    <option value="">Semua Grup</option>
+                    <option value="Checkbox">Checkbox</option>
+                </select>
+            </div>
+
+            <div class="filter-item" style="display: none;">
+                <label for="AccountSelect">Filter Account:</label>
+                <select id="AccountSelect" class="group-dropdown">
+                    <option value="">Semua Grup</option>
+                    <option value="Account 1">Account 1</option>
+                    <option value="Account 2">Account 2</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
+                <label for="filterStarSelect">Filter Star:</label>
+                <select id="filterStarSelect">
+                    <option value="all">Semua</option>
+                    <option value="star-0">No Star</option>
+                    <option value="star-1">Bintang 1</option>
+                    <option value="star-2">Bintang 2</option>
+                    <option value="star-3">Bintang 3</option>
+                    <option value="star-4">Bintang 4</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
+                <label for="filterSupportDesktopSelect">Filter Support:</label>
+                <select id="filterSupportDesktopSelect">
+                    <option value="all">Semua</option>
+                    <option value="SupportDesktop">Support Desktop</option>
+                    <option value="NoSupportDesktop">No Support Desktop</option>
+                </select>
+                <select id="filterSupportEmulatorSelect" style="display: none;">
+                    <option value="all">Semua</option>
+                    <option value="SupportEmulator">Send to Emulator</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tombol untuk menggulir ke bawah -->
+    <button id="scrollToBottomBtn" class="scroll-button scroll-to-bottom">Scroll to Bottom</button>
+
+    <!-- <div id="dataCount"></div> -->
+    <ul id="dataList"></ul>
+
+    <button id="scrollToTopBtn" class="scroll-button scroll-to-top">Scroll to Top</button>
+
+    <h2 style="text-align: center;">Buat List</h2>
+
+    <form id="dataForm" class="dataForm">
+        <label for="nama">Nama:</label>
+        <input type="text" name="nama" id="nama" placeholder="Masukkan nama" required>
+        <br><br>
+        <label for="nomor">Nomor:</label>
+        <input type="number" name="nomor" id="nomor" placeholder="Masukkan nomor" required>
+        <br><br>
+        <label for="link">Link Telegram:</label>
+        <input type="text" name="link" id="link" placeholder="Masukkan link" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getDatabase, ref, set, get, child, remove, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArJ1nln6fDepanPT51mM-FUhBheXOXB_Y",
+            authDomain: "reminder-d84a2.firebaseapp.com",
+            projectId: "reminder-d84a2",
+            storageBucket: "reminder-d84a2.appspot.com",
+            messagingSenderId: "1020985301424",
+            appId: "1:1020985301424:web:427ccb088fa1a721fb9e75",
+            databaseURL: "https://reminder-d84a2-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        //fitur search nama data
+        document.getElementById('searchInput').addEventListener('input', function () {
+            fetchData();
+        });
+
+        //fitur filter data attempts
+        document.addEventListener('DOMContentLoaded', function () {
+            const storedGroup = localStorage.getItem('selectedGroup');
+            const storedAccount = localStorage.getItem('selectedAccount')
+            const storedFilterAttempts = localStorage.getItem('filterAttempts');
+            const storedFilterStar = localStorage.getItem('filterStar');
+            const storedSupportDesktop = localStorage.getItem('filterSupportDesktop');
+            const storedSupportEmulator = localStorage.getItem('filterSupportEmulator');
+
+            if (storedGroup) {
+                document.getElementById('groupSelect').value = storedGroup;
+            }
+
+            if (storedAccount) {
+                document.getElementById('AccountSelect').value = storedAccount;
+            }
+
+            if (storedFilterAttempts) {
+                document.getElementById('filterSelect').value = storedFilterAttempts;
+            }
+
+            if (storedFilterStar) {
+                document.getElementById('filterStarSelect').value = storedFilterStar;
+            }
+
+            if (storedSupportDesktop) {
+                document.getElementById('filterSupportDesktopSelect').value = storedSupportDesktop;
+            }
+
+            if (storedSupportEmulator) {
+                document.getElementById('filterSupportEmulatorSelect').value = storedSupportEmulator;
+            }
+
+            fetchData();
+        });
+
+        document.getElementById('groupSelect').addEventListener('change', function () {
+            // Store the selected value in localStorage
+            localStorage.setItem('selectedGroup', this.value);
+            fetchData();
+        });
+
+        document.getElementById('AccountSelect').addEventListener('change', function () {
+            // Store the selected value in localStorage
+            localStorage.setItem('selectedAccount', this.value);
+            fetchData();
+        });
+
+        document.getElementById('filterSelect').addEventListener('change', function () {
+            localStorage.setItem('filterAttempts', this.value);
+            fetchData();
+        });
+
+        document.getElementById('filterStarSelect').addEventListener('change', function () {
+            localStorage.setItem('filterStar', this.value);
+            fetchData();
+        });
+
+        // Save selected filter to localStorage and fetch data
+        document.getElementById('filterSupportDesktopSelect').addEventListener('change', function () {
+            localStorage.setItem('filterSupportDesktop', this.value);
+            fetchData(); // Call your data fetching function
+        });
+
+        document.getElementById('filterSupportEmulatorSelect').addEventListener('change', function () {
+            localStorage.setItem('filterSupportEmulator', this.value);
+            fetchData(); // Call your data fetching function
+        });
+
+
+        let globalAttempts = {}; // Object to store attempts for each data item
+        let countdownInterval;
+        const display = document.getElementById('countdown');
+        const startButton = document.getElementById('startButton');
+
+        // Firebase reference
+        const timerRef = ref(database, 'timer/endTime');
+
+        function startCountdown() {
+            const now = new Date();
+            const endTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 1 minute from now
+
+            // Simpan endTime ke Firebase
+            set(timerRef, endTime.toISOString());
+
+            resetAttemptsInDatabase();
+
+            startButton.disabled = true; // Disable the button
+            startButton.style.display = 'none'; // Hide the button
+
+            // Menampilkan alert ketika timer dimulai
+            alert('Timer dimulai! Waktu tersisa 1 menit.');
+
+            function updateCountdown() {
+                const now = new Date();
+                const timeRemaining = new Date(endTime) - now;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(countdownInterval);
+                    display.textContent = 'Sisa waktu: 0 jam 0 menit 0 detik';
+                    alert('Countdown selesai!');
+                    startButton.disabled = false; // Enable the button
+                    startButton.style.display = 'block'; // Show the button again
+                    remove(timerRef); // Remove endTime from Firebase after countdown is over
+                    return;
+                }
+
+                const seconds = Math.floor((timeRemaining / 1000) % 60);
+                const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
+                const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
+
+                display.textContent = `Sisa waktu: ${hours} jam ${minutes} menit ${seconds} detik`;
+            }
+
+            countdownInterval = setInterval(updateCountdown, 1000);
+            updateCountdown(); // Initial call to display the countdown immediately
+        }
+
+        // Check endTime when the page loads
+        window.onload = function () {
+            get(timerRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const endTime = new Date(snapshot.val());
+                    const now = new Date();
+                    const timeRemaining = endTime - now;
+
+                    if (timeRemaining > 0) {
+                        // Timer is running
+                        startButton.disabled = true;
+                        startButton.style.display = 'none';
+                        countdownInterval = setInterval(() => {
+                            const now = new Date();
+                            const timeRemaining = endTime - now;
+
+                            if (timeRemaining <= 0) {
+                                clearInterval(countdownInterval);
+                                display.textContent = 'Sisa waktu: 0 jam 0 menit 0 detik';
+                                startButton.disabled = false; // Enable the button
+                                startButton.style.display = 'block'; // Show the button again
+                                remove(timerRef); // Remove endTime from Firebase after countdown is over
+                                return;
+                            }
+
+                            const seconds = Math.floor((timeRemaining / 1000) % 60);
+                            const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
+                            const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
+
+                            display.textContent = `Sisa waktu: ${hours} jam ${minutes} menit ${seconds} detik`;
+                        }, 1000);
+                    } else {
+                        // Timer is not running or expired
+                        startButton.disabled = false;
+                        startButton.style.display = 'block';
+                    }
+                } else {
+                    // No endTime in Firebase, assume timer is not running
+                    startButton.disabled = false;
+                    startButton.style.display = 'block';
+                }
+            });
+        }
+
+        const stars = document.querySelectorAll('.rating .star');
+
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function () {
+                const value = parseInt(this.getAttribute('data-value'));
+                stars.forEach(s => {
+                    if (parseInt(s.getAttribute('data-value')) <= value) {
+                        s.classList.add('hover');
+                    } else {
+                        s.classList.remove('hover');
+                    }
+                });
+            });
+
+            star.addEventListener('mouseout', function () {
+                stars.forEach(s => s.classList.remove('hover'));
+            });
+
+            star.addEventListener('click', function () {
+                stars.forEach(s => s.classList.remove('selected'));
+                const value = parseInt(this.getAttribute('data-value'));
+                stars.forEach(s => {
+                    if (parseInt(s.getAttribute('data-value')) <= value) {
+                        s.classList.add('selected');
+                    }
+                });
+            });
+        });
+
+        let lastClickedKey = null; // Variabel untuk menyimpan kunci item terakhir yang diklik
+
+        function fetchData() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const selectedGroup = document.getElementById('groupSelect').value;
+            const selectedAccount = document.getElementById('AccountSelect').value;
+            const filterAttempts = document.getElementById('filterSelect').value;
+            const filterStar = document.getElementById('filterStarSelect').value;
+            const filterSupportDesktop = document.getElementById('filterSupportDesktopSelect').value;
+            const filterSupportEmulator = document.getElementById('filterSupportEmulatorSelect').value;
+
+            const dbRef = ref(database);
+
+            // Get last clicked key from localStorage or Firebase
+            const lastClickedKey = localStorage.getItem('lastClickedKey'); // Replace with Firebase logic if needed
+
+            // Inisialisasi counter untuk menghitung data yang ditampilkan
+            let countDisplayedData = 0;
+            let countTimerOut = 0;
+
+            get(child(dbRef, 'users')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const dataList = document.getElementById('dataList');
+                    const dataCount = document.getElementById('dataCount');
+                    dataList.innerHTML = '';
+
+                    const expiredItems = [];
+                    const activeItems = [];
+                    let lastClickedItem = null;
+
+                    snapshot.forEach((childSnapshot) => {
+                        const data = childSnapshot.val();
+                        const groups = Array.isArray(data.group) ? data.group : [data.group];
+                        const accounts = Array.isArray(data.account) ? data.account : [data.account];
+
+                        // Check if the search query matches the name
+                        const matchesSearch = data.nama.toLowerCase().includes(searchQuery);
+
+                        // Check if the selected group matches or if 'All Groups' is selected
+                        const matchesGroup = selectedGroup === '' || groups.includes(selectedGroup);
+
+                        // Determine if the selectedAccount should include undefined values
+                        let matchesAccount;
+                        if (selectedAccount === '') {
+                            // No specific account selected, show all
+                            matchesAccount = true;
+                        } else if (selectedAccount === 'Account 1') {
+                            // Include 'Account 1' and undefined
+                            matchesAccount = accounts.includes(selectedAccount) || accounts.includes(undefined);
+                        } else {
+                            // Check if the account matches the selected value
+                            matchesAccount = accounts.includes(selectedAccount);
+                        }
+
+                        // Filter conditions for attempts
+                        const matchesAttempts = filterAttempts === 'all' || (filterAttempts === 'zero' && data.attempts === 0) ||
+                            (filterAttempts === 'Attempts 1' && data.attempts === 1) ||
+                            (filterAttempts === 'Attempts 2' && data.attempts === 2) ||
+                            (filterAttempts === 'Attempts 3++' && data.attempts > 2);
+
+                        // Filter conditions for star rating
+                        const matchesStar = filterStar === 'all' ||
+                            (filterStar === 'star-0' && (data.rating === 0 || data.rating === '' || data.rating === undefined)) ||
+                            (filterStar === 'star-1' && data.rating === 1) ||
+                            (filterStar === 'star-2' && data.rating === 2) ||
+                            (filterStar === 'star-3' && data.rating === 3) ||
+                            (filterStar === 'star-4' && data.rating === 4);
+
+                        // Filter conditions for support to desktop
+                        const matchesSupportDesktop = filterSupportDesktop === 'all' ||
+                            (filterSupportDesktop === 'SupportDesktop' && data.supportToDesktop === true) ||
+                            (filterSupportDesktop === 'NoSupportDesktop' &&
+                                (data.supportToDesktop === false || data.supportToDesktop === '' || data.supportToDesktop === undefined)
+                            );
+
+                        // Filter conditions for support to emulator
+                        const matchesSupportEmulator = filterSupportEmulator === 'all' ||
+                            (filterSupportEmulator === 'SupportEmulator' && data.supportToEmulator === true) ||
+                            (filterSupportEmulator === 'NoSupportEmulator' &&
+                                (data.supportToEmulator === false || data.supportToEmulator === '' || data.supportToEmulator === undefined)
+                            );
+
+                        // Combine all conditions
+                        if (matchesSearch && matchesGroup && matchesAccount && matchesAttempts && matchesStar && matchesSupportDesktop && matchesSupportEmulator) {
+                            countDisplayedData++;
+                            const listItem = document.createElement('li');
+                            const dataKey = childSnapshot.key;
+
+                            listItem.innerHTML = `
+                            <div class="rating" data-key="${dataKey}">
+                                <span class="star" data-value="1">&#9733;</span>
+                                <span class="star" data-value="2">&#9733;</span>
+                                <span class="star" data-value="3">&#9733;</span>
+                                <span class="star" data-value="4">&#9733;</span>
+                            </div>
+                        <span class="attempts-count">Attempts: ${data.attempts || 0}</span>
+                        <span>Nama: ${data.nama}</span>
+                        <span>Nomor: ${data.nomor}</span>
+                        <span class="timer"></span>
+                        <a href="${data.link}" target="_blank" class="reset-button">Link Telegram</a>
+                    `;
+
+                            const timerSpan = listItem.querySelector('.timer');
+                            const attemptsSpan = listItem.querySelector('.attempts-count');
+                            const ratingContainer = listItem.querySelector('.rating');
+
+                            // Set rating awal
+                            const currentRating = data.rating || 0;
+                            ratingContainer.querySelectorAll('.star').forEach((star, index) => {
+                                if (index < currentRating) {
+                                    star.classList.add('selected');
+                                } else {
+                                    star.classList.remove('selected');
+                                }
+                            });
+
+                            // Menangani klik pada bintang
+                            ratingContainer.querySelectorAll('.star').forEach(star => {
+                                star.addEventListener('click', () => {
+                                    const ratingValue = parseInt(star.getAttribute('data-value'), 10);
+                                    const stars = ratingContainer.querySelectorAll('.star');
+
+                                    // Set rating baru
+                                    stars.forEach((s, index) => {
+                                        if (index < ratingValue) {
+                                            s.classList.add('selected');
+                                        } else {
+                                            s.classList.remove('selected');
+                                        }
+                                    });
+
+                                    // Simpan rating ke Firebase
+                                    update(ref(database, 'users/' + dataKey), {
+                                        rating: ratingValue
+                                    }).then(() => {
+                                        console.log('Rating berhasil disimpan: ', ratingValue);
+                                    }).catch((error) => {
+                                        console.error('Gagal menyimpan rating: ', error);
+                                    });
+                                });
+                            });
+
+                            const editButton = document.createElement('button');
+                            editButton.classList.add('edit-button');
+                            editButton.textContent = 'Edit';
+                            editButton.addEventListener('click', () => {
+                                editData(childSnapshot.key, data.nomor, data.nama, data.link);
+                            });
+                            listItem.appendChild(editButton);
+
+                            const deleteButton = document.createElement('button');
+                            deleteButton.classList.add('delete-button');
+                            deleteButton.textContent = 'Hapus';
+                            deleteButton.addEventListener('click', () => {
+                                const confirmDelete = confirm('Apakah Anda yakin ingin menghapus data ini?');
+                                if (confirmDelete) {
+                                    deleteData(childSnapshot.key);
+                                }
+                            });
+                            listItem.appendChild(deleteButton);
+
+                            const checkbox = document.createElement('input');
+                            checkbox.classList.add('form-checkbox');
+                            checkbox.type = 'checkbox';
+                            checkbox.checked = data.checked || false;
+                            checkbox.style.width = '20px';
+                            checkbox.style.height = '20px';
+                            checkbox.style.marginLeft = '30px';
+                            checkbox.addEventListener('change', () => {
+                                updateCheckboxAndMoveGroup(childSnapshot.key, checkbox.checked);
+                            });
+                            listItem.appendChild(checkbox);
+
+                            const link = listItem.querySelector('.reset-button');
+                            link.addEventListener('click', (event) => {
+                                event.preventDefault(); // Prevent default link behavior
+
+                                const updatedAttempts = (data.attempts || 0) + 1;
+                                update(ref(database, 'users/' + dataKey), {
+                                    attempts: updatedAttempts
+                                }).then(() => {
+                                    listItem.querySelector('.attempts-count').textContent = `Attempts: ${updatedAttempts}`;
+                                }).catch((error) => {
+                                    console.error('Failed to update attempts: ', error);
+                                });
+
+                                localStorage.setItem('lastClickedKey', dataKey);
+
+                                DataResetTimer(dataKey, data.link);
+                            });
+
+                            // Append the note input (as a text input)
+                            const noteInput = document.createElement('input');
+                            noteInput.type = 'text';
+                            noteInput.classList.add('note-input');
+
+                            // Add inline style to match the group dropdown, with no margin between elements
+                            noteInput.style.cssText = 'width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; margin-bottom: 20px;';
+                            noteInput.value = data.note;
+                            noteInput.readOnly = true;
+
+                            noteInput.addEventListener('click', () => {
+                                noteData(childSnapshot.key, data.note, data.bigNote, data.nama); // Sertakan nama
+                            });
+
+                            listItem.appendChild(noteInput);
+
+                            // Create a wrapper div for the dropdowns
+                            const dropdownWrapper = document.createElement('div');
+                            dropdownWrapper.style.display = 'flex';
+                            dropdownWrapper.style.gap = '10px'; // Optional: add space between dropdowns
+
+                            // Append the group dropdown
+                            const groupDropdown = document.createElement('select');
+                            groupDropdown.classList.add('group-dropdown');
+                            groupDropdown.style.cssText = 'display:none; width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;';
+
+                            // Populate the group dropdown
+                            ['Tap bot', 'Simple Play', 'Stay'].forEach(group => {
+                                const option = document.createElement('option');
+                                option.value = group;
+                                option.text = group;
+                                groupDropdown.appendChild(option);
+                            });
+
+                            // Set the value of the dropdown to the first group the data is part of
+                            groupDropdown.value = groups.find(group => ['Tap bot', 'Simple Play', 'Stay', 'Checkbox'].includes(group)) || 'Tap hand';
+
+                            // Append the group dropdown to the wrapper
+                            dropdownWrapper.appendChild(groupDropdown);
+
+                            // Create the account dropdown
+                            const accountDropdown = document.createElement('select');
+                            accountDropdown.classList.add('group-dropdown');
+                            accountDropdown.style.cssText = 'display:none; width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;';
+
+                            // Populate the account dropdown
+                            ['Account 1', 'Account 2'].forEach(account => {
+                                const option = document.createElement('option');
+                                option.value = account;
+                                option.text = account;
+                                accountDropdown.appendChild(option);
+                            });
+
+                            // Set the value of the account dropdown to the first matching account
+                            accountDropdown.value = accounts.find(account => ['Account 1', 'Account 2'].includes(account)) || 'Account 1';
+
+                            // Append the account dropdown to the wrapper
+                            dropdownWrapper.appendChild(accountDropdown);
+
+                            // Append the wrapper div to the listItem
+                            listItem.appendChild(dropdownWrapper);
+
+
+                            // Checkbox creation for supportToDesktop
+                            const supportToDesktopCheckbox = document.createElement('input');
+                            supportToDesktopCheckbox.classList.add('form-checkbox-supportToDesktop');
+                            supportToDesktopCheckbox.type = 'checkbox';
+                            supportToDesktopCheckbox.checked = data.supportToDesktop || false;
+                            supportToDesktopCheckbox.style.marginLeft = '30px';
+                            supportToDesktopCheckbox.addEventListener('change', () => {
+                                updateSupportToDesktopInFirebase(childSnapshot.key, supportToDesktopCheckbox.checked);
+                            });
+                            listItem.appendChild(supportToDesktopCheckbox);
+
+
+                            // Checkbox creation for supportToDesktop
+                            const supportToEmulatorCheckbox = document.createElement('input');
+                            supportToEmulatorCheckbox.classList.add('form-checkbox-supportToEmulator');
+                            supportToEmulatorCheckbox.style.cssText = 'display:none';
+                            supportToEmulatorCheckbox.type = 'checkbox';
+                            supportToEmulatorCheckbox.checked = data.supportToEmulator || false;
+                            supportToEmulatorCheckbox.style.marginLeft = '30px';
+                            supportToEmulatorCheckbox.addEventListener('change', () => {
+                                updateSupportToEmulatorInFirebase(childSnapshot.key, supportToEmulatorCheckbox.checked);
+                            });
+                            listItem.appendChild(supportToEmulatorCheckbox);
+
+                            // Single button for moving to a different group and account
+                            const moveButton = document.createElement('button');
+                            moveButton.classList.add('move-button');
+                            moveButton.textContent = 'Move to Group';
+                            moveButton.style.cssText = 'display:none';
+                            moveButton.addEventListener('click', () => {
+                                const selectedGroup = groupDropdown.value;
+                                const selectedAccount = accountDropdown.value;
+                                moveToGroupAndAccount(childSnapshot.key, selectedGroup, selectedAccount);
+                            });
+                            listItem.appendChild(moveButton);
+
+                            const imageContainer = document.createElement('div');
+                            imageContainer.classList.add('image-container');
+                            const image = document.createElement('img');
+                            image.src = 'green.png';
+                            image.style.display = 'none';
+                            imageContainer.appendChild(image);
+                            listItem.appendChild(imageContainer);
+
+                            const now = Date.now();
+                            const timestamp = data.timestamp || now;
+                            const timePassed = now - timestamp;
+                            const DataCountdownMinutes = data.nomor * 60 - Math.floor(timePassed / 1000);
+
+                            if (dataKey === lastClickedKey) {
+                                lastClickedItem = listItem;
+                            } else if (DataCountdownMinutes <= 0) {
+                                expiredItems.push(listItem);
+                                countTimerOut++;
+                            } else {
+                                activeItems.push(listItem);
+                            }
+
+                            DataStartTimer(DataCountdownMinutes, listItem.querySelector('.timer'), listItem.querySelector('img'), listItem.querySelector('.attempts-count'), dataKey);
+                        }
+                    });
+
+                    // Add a line break before adding expired and active items
+                    if (lastClickedItem) {
+                        dataList.appendChild(lastClickedItem);
+
+                        // Create a flexible line break (border) with inline style
+                        const lineBreak = document.createElement('div');
+                        lineBreak.classList.add('line-break'); // Add a class for styling
+                        dataList.appendChild(lineBreak);
+                    }
+
+                    expiredItems.forEach(item => dataList.appendChild(item));
+                    activeItems.forEach(item => dataList.appendChild(item));
+
+                    dataCount.textContent = snapshot.size;
+
+
+                } else {
+                    console.log('No data available');
+                    document.getElementById('dataCount').textContent = '0';
+                }
+
+
+                // Tampilkan total data yang ditampilkan
+                document.getElementById('countData').textContent = `Displayed: ${countDisplayedData}`;
+
+                // Tampilkan jumlah data yang waktunya telah habis
+                document.getElementById('countTimerOut').textContent = `(Expired: ${countTimerOut}`;
+
+                // Tampilkan jumlah data yang waktunya masih berjalan
+                const TimerRunning = countDisplayedData - countTimerOut;
+                document.getElementById('TimerRunning').textContent = `Running: ${TimerRunning})`;
+
+
+            }).catch((error) => {
+                console.error('Failed to read data: ', error);
+            });
+        }
+
+        const filterGroup = document.getElementById('filterGroup');
+        const hideGroupButton = document.getElementById('hide-group');
+
+        // Check localStorage for saved state
+        const savedState = localStorage.getItem('filterGroupHidden');
+
+        if (savedState === 'true') {
+            filterGroup.style.display = 'none';
+            hideGroupButton.textContent = 'Unhide';
+        } else {
+            filterGroup.style.display = 'grid';
+            hideGroupButton.textContent = 'Hide';
+        }
+
+        hideGroupButton.addEventListener('click', () => {
+            if (filterGroup.style.display === 'none') {
+                filterGroup.style.display = 'grid';
+                hideGroupButton.textContent = 'Hide';
+                localStorage.setItem('filterGroupHidden', 'false');
+            } else {
+                filterGroup.style.display = 'none';
+                hideGroupButton.textContent = 'Unhide';
+                localStorage.setItem('filterGroupHidden', 'true');
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('dataForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the form from submitting the default way
+            const nama = document.getElementById('nama').value;
+            const nomor = document.getElementById('nomor').value;
+            const link = document.getElementById('link').value;
+
+            // Write data to Firebase
+            const newRef = ref(database, 'users/' + Date.now());
+            set(newRef, {
+                nama: nama,
+                nomor: nomor,
+                link: link,
+                timestamp: Date.now(),
+                checked: false, // Initial checkbox state
+                group: 'Group 1' // Default group
+            }).then(() => {
+                fetchData(); // Refresh data
+                document.getElementById('dataForm').reset(); // Reset the form
+            }).catch((error) => {
+                console.error('Gagal menulis data: ', error);
+            });
+        });
+
+
+        // Function to open the modal and populate the inputs with current values
+        function editData(key, nomor, nama, link) {
+            document.getElementById('editNomor').value = nomor;
+            document.getElementById('editNama').value = nama;
+            document.getElementById('editLink').value = link;
+            document.getElementById('editModal').style.display = 'block';
+
+            // Store the key globally to use it when submitting
+            window.currentEditKey = key;
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Function to submit the updated data to Firebase
+        function submitEditData() {
+            const key = window.currentEditKey;
+            const newNomor = document.getElementById('editNomor').value;
+            const newNama = document.getElementById('editNama').value;
+            const newLink = document.getElementById('editLink').value;
+
+            // Update the data in Firebase
+            update(ref(database, 'users/' + key), {
+                nomor: newNomor,
+                nama: newNama,
+                link: newLink
+            }).then(() => {
+                fetchData(); // Refresh data
+                closeModal(); // Close the modal
+                alert('Data berhasil diperbarui'); // Show success message
+            }).catch((error) => {
+                console.error('Gagal mengedit data: ', error);
+            });
+        }
+
+        // Function to open the edit note modal and populate the inputs with the current values
+        function noteData(key, note, bigNote, name) {
+            document.getElementById('noteName').innerText = `Nama: ${name}`;
+            document.getElementById('editNote').value = note;
+            document.getElementById('editBigNote').value = bigNote;
+            document.getElementById('editNoteModal').style.display = 'block';
+
+            // Populate the links
+            window.currentEditNoteKey = key;
+
+            // Fetch and display links from Firebase
+            const dataRef = ref(database, 'users/' + key);
+            get(dataRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    window.currentLinks = data.links || []; // Get links or default to empty array
+                    displayLinks();
+                } else {
+                    console.log('No data available for note links');
+                    window.currentLinks = [];
+                    displayLinks();
+                }
+            }).catch((error) => {
+                console.error('Failed to fetch note data: ', error);
+                window.currentLinks = [];
+                displayLinks();
+            });
+        }
+
+        // Function to display links with numbering
+        function displayLinks() {
+            const linksContainer = document.getElementById('linksContainer');
+            linksContainer.innerHTML = '';
+
+            window.currentLinks.forEach((link, index) => {
+                const linkDiv = document.createElement('div');
+                linkDiv.classList.add('link-item');
+
+                // Create a span for numbering
+                const numberSpan = document.createElement('span');
+                numberSpan.classList.add('link-number');
+                numberSpan.innerText = `${index + 1}. `; // Add numbering (1, 2, 3, ...)
+
+                const linkButton = document.createElement('button');
+                linkButton.innerText = link.label;
+                linkButton.onclick = () => window.open(link.url, '_blank');
+
+                const editButton = document.createElement('button');
+                editButton.innerText = 'Edit';
+                editButton.onclick = () => editLink(index);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Delete';
+                deleteButton.onclick = () => deleteLink(index);
+
+                linkDiv.appendChild(numberSpan); // Add numbering before the link
+                linkDiv.appendChild(linkButton);
+                linkDiv.appendChild(editButton);
+                linkDiv.appendChild(deleteButton);
+                linksContainer.appendChild(linkDiv);
+            });
+        }
+
+
+        // Function to add a new link
+        document.getElementById('addLinkButton').addEventListener('click', () => {
+            const label = document.getElementById('linkLabel').value;
+            const url = document.getElementById('linkUrl').value;
+
+            if (label && url) {
+                window.currentLinks.push({ label, url });
+                displayLinks();
+            }
+        });
+
+        // Function to edit an existing link
+        function editLink(index) {
+            const newLabel = prompt('Edit label:', window.currentLinks[index].label);
+            const newUrl = prompt('Edit URL:', window.currentLinks[index].url);
+
+            if (newLabel !== null && newUrl !== null) {
+                window.currentLinks[index] = { label: newLabel, url: newUrl };
+                displayLinks();
+            }
+        }
+
+        // Function to delete an existing link
+        function deleteLink(index) {
+            if (confirm('Are you sure you want to delete this link?')) {
+                window.currentLinks.splice(index, 1);
+                displayLinks();
+            }
+        }
+
+        // Function to close the edit note modal
+        function closeNoteModal() {
+            document.getElementById('editNoteModal').style.display = 'none';
+        }
+
+        // Function to submit the updated note to Firebase
+        function submitEditNote() {
+            const key = window.currentEditNoteKey;
+            const newNote = document.getElementById('editNote').value;
+            const newBigNote = document.getElementById('editBigNote').value;
+
+            // Update the note, bigNote, and links in Firebase
+            update(ref(database, 'users/' + key), {
+                note: newNote,
+                bigNote: newBigNote,
+                links: window.currentLinks // Update links
+            }).then(() => {
+                fetchData(); // Refresh data
+                closeNoteModal(); // Close the modal
+                alert('Note berhasil diperbarui'); // Show success message
+            }).catch((error) => {
+                console.error('Gagal mengedit note: ', error);
+            });
+        }
+
+        // Add event listener to the submit button in the edit note modal
+        document.querySelector('#editNoteModal button[onclick="submitEditNote()"]').addEventListener('click', submitEditNote);
+
+        // Add event listener to the cancel button in the edit note modal
+        document.querySelector('#editNoteModal button[onclick="closeNoteModal()"]').addEventListener('click', closeNoteModal);
+
+        // Add event listener to the submit button in the edit modal
+        document.querySelector('#editModal button[onclick="submitEditData()"]').addEventListener('click', submitEditData);
+
+        // Add event listener to the cancel button in the edit modal
+        document.querySelector('#editModal button[onclick="closeModal()"]').addEventListener('click', closeModal);
+
+
+        // Delete data from Firebase
+        function deleteData(key) {
+            remove(ref(database, 'users/' + key)).catch((error) => {
+                console.error('Gagal menghapus data: ', error);
+            });
+        }
+
+        // Update checkbox state and move to a different group in Firebase
+        function updateCheckboxAndMoveGroup(key, checked) {
+            const userRef = ref(database, `/users/${key}`);
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    let groups = userData.group || [];
+                    groups = Array.isArray(groups) ? groups : [groups];
+
+                    if (checked) {
+                        // Tambahkan "Checkbox" ke grup jika belum ada
+                        if (!groups.includes('Checkbox')) {
+                            groups.push('Checkbox');
+                            alert('Data berhasil masuk ke dalam grup Checkbox');
+                        }
+                    } else {
+                        // Hapus "Checkbox" dari grup
+                        groups = groups.filter(group => group !== 'Checkbox');
+                    }
+
+                    const updates = {};
+                    updates[`/users/${key}/checked`] = checked;
+                    updates[`/users/${key}/group`] = groups;
+
+                    update(ref(database), updates).then(() => {
+                        fetchData(); // Refresh data
+                    }).catch((error) => {
+                        console.error('Gagal memperbarui checkbox atau memindahkan data: ', error);
+                    });
+                } else {
+                    console.error('Data tidak ditemukan untuk kunci: ', key);
+                }
+            }).catch((error) => {
+                console.error('Gagal membaca data: ', error);
+            });
+        }
+
+        // Function to move data to a different group and account in Firebase
+        function moveToGroupAndAccount(key, group, account) {
+            update(ref(database, 'users/' + key), {
+                group: group,
+                account: account
+            }).then(() => {
+                fetchData(); // Refresh data
+                alert('Data berhasil dipindahkan ke grup ' + group + ' dan account ' + account);
+            }).catch((error) => {
+                console.error('Gagal memindahkan data: ', error);
+            });
+        }
+
+
+        // Function to update Firebase with alert
+        function updateSupportToDesktopInFirebase(key, isChecked) {
+            const dbRef = ref(database, 'users/' + key);
+            update(dbRef, {
+                supportToDesktop: isChecked
+            }).then(() => {
+                alert('Support to Desktop status successfully updated in Firebase!');
+            }).catch((error) => {
+                console.error('Error updating Support to Desktop status:', error);
+            });
+        }
+
+        // Function to update Firebase with alert
+        function updateSupportToEmulatorInFirebase(key, isCheckedEmulator) {
+            const dbRef = ref(database, 'users/' + key);
+            update(dbRef, {
+                supportToEmulator: isCheckedEmulator
+            }).then(() => {
+                alert('Support to Emulator status successfully updated in Firebase!');
+            }).catch((error) => {
+                console.error('Error updating Support to Desktop status:', error);
+            });
+        }
+
+        // Function to update Firebase with alert for updateIconDone
+        function updateIconDone(key, isCheckeds) {
+            const dbRef = ref(database, 'users/' + key);
+            update(dbRef, {
+                IconDone: isCheckeds
+            }).then(() => {
+                alert('Icon status successfully updated in Firebase!');
+            }).catch((error) => {
+                console.error('Error updating Icon status:', error);
+            });
+        }
+
+
+
+        function DataResetTimer(key, link) {
+            const dataRef = ref(database, 'users/' + key);
+            update(dataRef, {
+                timestamp: Date.now()
+            }).then(() => {
+                window.open(link, '_blank');
+                fetchData();
+            }).catch((error) => {
+                console.error('Gagal me-reset timer: ', error);
+            });
+        }
+
+        function DataStartTimer(minutes, displayElement, imageElement, attemptsSpan, dataKey) {
+            let timer = minutes;
+            displayElement.addEventListener('click', () => {
+                globalAttempts[dataKey]++;
+                attemptsSpan.textContent = `Attempts: ${globalAttempts[dataKey]}`;
+            });
+
+            const countdown = setInterval(() => {
+                const minutes = Math.floor(timer / 60);
+                const seconds = timer % 60;
+                displayElement.textContent = `Waktu tersisa: ${minutes}:${seconds < 10 ? '0' : ''}${seconds} menit`;
+
+                if (--timer < 0) {
+                    clearInterval(countdown);
+                    displayElement.textContent = 'Waktu habis!';
+                    imageElement.style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        // Tambahkan kode untuk tombol scroll
+        document.getElementById('scrollToBottomBtn').addEventListener('click', function () {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+
+        document.getElementById('scrollToTopBtn').addEventListener('click', function () {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Fungsi untuk menampilkan atau menyembunyikan tombol scroll
+        window.addEventListener('scroll', function () {
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+            if (window.scrollY > 100) {
+                scrollToTopBtn.style.display = 'block';
+            } else {
+                scrollToTopBtn.style.display = 'none';
+            }
+
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+                scrollToBottomBtn.style.display = 'none';
+            } else {
+                scrollToBottomBtn.style.display = 'block';
+            }
+        });
+
+        document.getElementById('reloadButton').addEventListener('click', function () {
+            location.reload();
+        });
+
+        function resetAttemptsInDatabase() {
+            const dbRef = ref(database, 'users');
+            get(dbRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const dataKey = childSnapshot.key;
+
+                        // Update each user's attempts to 0
+                        update(ref(database, 'users/' + dataKey), {
+                            attempts: 0
+                        });
+                    });
+                    console.log('All attempts have been reset to 0');
+                }
+            }).catch((error) => {
+                console.error('Failed to reset attempts: ', error);
+            });
+        }
+
+        // Function to continue countdown if endTime is already in Firebase
+        function continueCountdown() {
+            get(timerRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const endTime = new Date(snapshot.val());
+                    const now = new Date();
+                    const timeRemaining = endTime - now;
+
+                    if (timeRemaining > 0) {
+                        startButton.disabled = true; // Disable the button
+                        countdownInterval = setInterval(() => {
+                            const now = new Date();
+                            const timeRemaining = endTime - now;
+
+                            if (timeRemaining <= 0) {
+                                clearInterval(countdownInterval);
+                                display.textContent = 'Sisa waktu: 0 jam 0 menit 0 detik';
+                                alert('Countdown selesai!');
+                                startButton.disabled = false; // Enable the button
+                                remove(timerRef); // Remove endTime from Firebase after countdown is over
+                                return;
+                            }
+
+                            const seconds = Math.floor((timeRemaining / 1000) % 60);
+                            const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
+                            const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
+
+                            display.textContent = `Sisa waktu: ${hours} jam ${minutes} menit ${seconds} detik`;
+                        }, 1000);
+                    } else {
+                        // Timer has already finished
+                        remove(timerRef); // Remove endTime from Firebase
+                    }
+                }
+            }).catch((error) => {
+                console.error('Failed to get endTime from Firebase: ', error);
+            });
+        }
+
+        // Check if there is an existing countdown
+        continueCountdown();
+
+        // Event listener for the start button
+        startButton.addEventListener('click', startCountdown);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+        });
+
+
+    </script>
+</body>
+
+</html>
